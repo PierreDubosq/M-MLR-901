@@ -1,22 +1,9 @@
-import black
-import grin
-import pandas
-import jupyterlab
-import kneed
 import matplotlib.pyplot
-import mypy
 import numpy
 import pandas
-import sklearn
-import scipy
-import seaborn
-import snakeviz
-import termcolor
-import wikipedia
 import enum
 import datetime
 import sys
-import math
 
 
 DATA_PATH = 'data.csv'
