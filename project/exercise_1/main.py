@@ -41,7 +41,6 @@ class Color(enum.Enum):
   BRIGHT_WHITE = '\033[97m'
 
 
-
 class Logger:
 
   """
@@ -83,57 +82,104 @@ class Logger:
     print(f'{Color.BRIGHT_BLUE.value}{date} {Color.BRIGHT_YELLOW.value}[{self._name}] {Color.BRIGHT_YELLOW.value}{message}{Color.DEFAULT.value}', flush=True, file=sys.stderr)
 
 
-def main() -> None:
+def help() -> None:
+  logger = Logger('help')
+
+  try:
+    logger.info(f'{"*"*10} HELP {"*"*10}\n')
+    logger.info(f'{" "*2}Usage')
+    logger.info(f'{" "*4}python main.py [command]\n')
+    logger.info(f'{" "*2}Commands')
+    logger.info(f'{" "*4}Help\tDisplay this help menu')
+    logger.info(f'{" "*4}1   \tExecute part 1')
+    logger.info(f'{" "*4}2   \tExecute part 2')
+    logger.info(f'{" "*4}3   \tExecute part 3')
+  except Exception as e:
+    logger.error(e)
+    raise e
+
+def generate_random_variable(num_points):
+  logger = Logger('generate_random_variable')
+
+  try:
+    X = numpy.random.normal(loc=30, scale=10, size=num_points)
+    Y = numpy.random.uniform(low=0, high=100, size=num_points)
+    Z = numpy.column_stack((X, Y))
+    return Z
+  except Exception as e:
+    logger.error(e)
+    raise e
+
+def compute_expected_value(Z):
+  logger = Logger('compute_expected_value')
+
+  try:
+    return numpy.mean(Z, axis=0)
+  except Exception as e:
+    logger.error(e)
+    raise e
+
+def sample_and_plot(Z, num_points):
+  logger = Logger('sample_and_plot')
+
+  try:
+    sampled_points = generate_random_variable(num_points)
+    matplotlib.pyplot.scatter(sampled_points[:, 0], sampled_points[:, 1], alpha=0.5)
+    matplotlib.pyplot.title(f'Sampled Points from Z ({num_points} points)')
+    matplotlib.pyplot.xlabel('X')
+    matplotlib.pyplot.ylabel('Y')
+    matplotlib.pyplot.show()
+  except Exception as e:
+    logger.error(e)
+    raise e
+
+def compute_and_plot_convergence(Z, max_n):
+  logger = Logger('compute_and_plot_convergence')
+
+  try:
+    expected_value = compute_expected_value(Z)
+    distances = []
+
+    for n in range(1, max_n + 1):
+        sampled_points = generate_random_variable(n)
+        empirical_average = numpy.mean(sampled_points, axis=0)
+        distance = numpy.linalg.norm(empirical_average - expected_value)
+        distances.append(distance)
+
+    matplotlib.pyplot.plot(range(1, max_n + 1), distances)
+    matplotlib.pyplot.title('Convergence of Empirical Average to Expected Value')
+    matplotlib.pyplot.xlabel('Number of Samples (n)')
+    matplotlib.pyplot.ylabel('Euclidean Distance')
+    matplotlib.pyplot.show()
+  except Exception as e:
+    logger.error(e)
+    raise e
+
+
+def main(argv: list[str]) -> None:
   logger = Logger('main')
 
   try:
-    Z: pandas.DataFrame = pandas.read_csv(DATA_PATH)[['Year', 'Mean male height (cm)']].groupby('Year').mean().reset_index()
-    expected_value: int = Z['Mean male height (cm)'].mean()
+    if len(argv) != 2:
+      help()
+      sys.exit(1)
 
-    # Choose the number of points to sample
-    n = 100
+    num_points = 1000
+    Z = generate_random_variable(num_points)
 
-    # Sample 'n' points from the DataFrame Z
-    sampled_points = Z.sample(n)
+    if argv[1] == '1':
+      logger.info(f'{"*"*10} Part 1 {"*"*10}')
+      expected_value = compute_expected_value(Z)
+      logger.info(f'Expected Value of Z: {expected_value}')
 
-    # Plot the sampled points
-    matplotlib.pyplot.scatter(sampled_points['Year'], sampled_points['Mean male height (cm)'], marker='o', color='blue')
-    matplotlib.pyplot.xlabel('Year')
-    matplotlib.pyplot.ylabel('Mean male height (cm)')
-    matplotlib.pyplot.title(f'Sampled Points from DataFrame Z (n={n})')
-    matplotlib.pyplot.show()
+    elif argv[1] == '2':
+      logger.info(f'{"*"*10} Part 2 {"*"*10}')
+      sample_and_plot(Z, num_points)
 
-    # Initialize arrays to store results
-    empirical_averages = []
-    euclidean_distances = []
-
-    # Sample for increasing values of n
-    for i in range(1, n + 1):
-        # Extract the first 'i' samples
-        subset_samples = sampled_points.head(i)
-        
-        # Calculate empirical average
-        empirical_average = subset_samples.mean()
-        
-        # Calculate Euclidean distance
-        distance = numpy.linalg.norm(empirical_average - expected_value)
-        
-        # Store results
-        empirical_averages.append(empirical_average)
-        euclidean_distances.append(distance)
-
-    # Convert lists to DataFrame for easier calculations
-    empirical_averages = pandas.DataFrame(empirical_averages)
-    euclidean_distances = numpy.array(euclidean_distances)
-
-    # Plot the convergence
-    matplotlib.pyplot.plot(range(1, n + 1), euclidean_distances, marker='o', color='blue')
-    matplotlib.pyplot.xlabel('Number of Samples (n)')
-    matplotlib.pyplot.ylabel('Euclidean Distance')
-    matplotlib.pyplot.title('Convergence of Empirical Average to Expected Value')
-    matplotlib.pyplot.axhline(0, color='red', linestyle='--', label='Expected Value')
-    matplotlib.pyplot.legend()
-    matplotlib.pyplot.show()
+    elif argv[1] == '3':
+      logger.info(f'{"*"*10} Part 3 {"*"*10}')
+      max_n = num_points * 10
+      compute_and_plot_convergence(Z, max_n)
   except Exception as e:
     logger.error(e)
     raise e
@@ -143,7 +189,7 @@ if __name__ == '__main__':
   logger = Logger('system')
 
   try:
-    main()
+    main(sys.argv)
   except Exception as e:
     logger.error(e)
     sys.exit(1)
