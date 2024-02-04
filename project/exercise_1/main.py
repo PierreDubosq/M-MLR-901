@@ -63,26 +63,65 @@ class Logger:
 
 
   def debug(self, message: str) -> None:
+    """
+    Prints a debug message with the current date and time, the name of the object, and the message.
+    
+    Args:
+      message (str): The debug message to be printed.
+      
+    Returns:
+      None
+    """
     date: str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f'{Color.BRIGHT_BLUE.value}{date} {Color.BRIGHT_YELLOW.value}[{self._name}] {Color.MAGENTA.value}{message}{Color.DEFAULT.value}', flush=True, file=sys.stdout)
 
 
   def error(self, message: str) -> None:
+    """
+    Prints an error message with the current date and time, the name of the object, and the error message.
+
+    Args:
+      message (str): The error message to be printed.
+
+    Returns:
+      None
+    """
     date: str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f'{Color.BRIGHT_BLUE.value}{date} {Color.BRIGHT_YELLOW.value}[{self._name}] {Color.BRIGHT_RED.value}{message}{Color.DEFAULT.value}', flush=True, file=sys.stderr)
 
 
   def info(self, message: str) -> None:
+    """
+    Prints the current date and time, along with the name of the object and the provided message.
+
+    Args:
+      message (str): The message to be printed.
+
+    Returns:
+      None
+    """
     date: str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f'{Color.BRIGHT_BLUE.value}{date} {Color.BRIGHT_YELLOW.value}[{self._name}] {Color.BRIGHT_GREEN.value}{message}{Color.DEFAULT.value}', flush=True, file=sys.stdout)
 
 
   def warning(self, message: str) -> None:
+    """
+    Prints a warning message with the current date and time, the name of the object, and the message.
+
+    Args:
+      message (str): The warning message.
+
+    Returns:
+      None
+    """
     date: str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f'{Color.BRIGHT_BLUE.value}{date} {Color.BRIGHT_YELLOW.value}[{self._name}] {Color.BRIGHT_YELLOW.value}{message}{Color.DEFAULT.value}', flush=True, file=sys.stderr)
 
 
-def help() -> None:
+def help():
+  """
+  Display the help menu with usage and available commands.
+  """
   logger = Logger('help')
 
   try:
@@ -98,7 +137,7 @@ def help() -> None:
     logger.error(e)
     raise e
 
-def generate_random_variable(num_points):
+def generate_random_variable(num_points: int):
   logger = Logger('generate_random_variable')
 
   try:
@@ -119,7 +158,7 @@ def compute_expected_value(Z):
     logger.error(e)
     raise e
 
-def sample_and_plot(Z, num_points):
+def sample_and_plot(num_points: int):
   logger = Logger('sample_and_plot')
 
   try:
@@ -164,7 +203,7 @@ def main(argv: list[str]) -> None:
       help()
       sys.exit(1)
 
-    num_points = 1000
+    num_points: int = 1000
     Z = generate_random_variable(num_points)
 
     if argv[1] == '1':
@@ -174,7 +213,7 @@ def main(argv: list[str]) -> None:
 
     elif argv[1] == '2':
       logger.info(f'{"*"*10} Part 2 {"*"*10}')
-      sample_and_plot(Z, num_points)
+      sample_and_plot(num_points)
 
     elif argv[1] == '3':
       logger.info(f'{"*"*10} Part 3 {"*"*10}')
