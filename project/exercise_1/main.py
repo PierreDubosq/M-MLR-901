@@ -138,6 +138,15 @@ def help():
     raise e
 
 def generate_random_variable(num_points: int):
+  """
+  Generate a random variable with given number of points.
+
+  Parameters:
+  - num_points (int): The number of points to generate.
+
+  Returns:
+  - Z (numpy.ndarray): The generated random variable as a 2D array.
+  """
   logger = Logger('generate_random_variable')
 
   try:
@@ -150,6 +159,18 @@ def generate_random_variable(num_points: int):
     raise e
 
 def compute_expected_value(Z):
+  """
+  Compute the expected value of a given array.
+
+  Parameters:
+  Z (numpy.ndarray): The input array.
+
+  Returns:
+  numpy.ndarray: The computed expected value.
+
+  Raises:
+  Exception: If an error occurs during computation.
+  """
   logger = Logger('compute_expected_value')
 
   try:
@@ -159,6 +180,18 @@ def compute_expected_value(Z):
     raise e
 
 def sample_and_plot(num_points: int):
+  """
+  Generate random variable samples and plot them.
+
+  Args:
+    num_points (int): The number of points to sample.
+
+  Raises:
+    Exception: If an error occurs during the sampling or plotting process.
+
+  Returns:
+    None
+  """
   logger = Logger('sample_and_plot')
 
   try:
@@ -173,6 +206,19 @@ def sample_and_plot(num_points: int):
     raise e
 
 def compute_and_plot_convergence(Z, max_n):
+  """
+  Computes and plots the convergence of the empirical average to the expected value.
+
+  Parameters:
+  Z (numpy.ndarray): The input data.
+  max_n (int): The maximum number of samples.
+
+  Raises:
+  Exception: If an error occurs during the computation or plotting.
+
+  Returns:
+  None
+  """
   logger = Logger('compute_and_plot_convergence')
 
   try:
@@ -180,10 +226,10 @@ def compute_and_plot_convergence(Z, max_n):
     distances = []
 
     for n in range(1, max_n + 1):
-        sampled_points = generate_random_variable(n)
-        empirical_average = numpy.mean(sampled_points, axis=0)
-        distance = numpy.linalg.norm(empirical_average - expected_value)
-        distances.append(distance)
+      sampled_points = generate_random_variable(n)
+      empirical_average = numpy.mean(sampled_points, axis=0)
+      distance = numpy.linalg.norm(empirical_average - expected_value)
+      distances.append(distance)
 
     matplotlib.pyplot.plot(range(1, max_n + 1), distances)
     matplotlib.pyplot.title('Convergence of Empirical Average to Expected Value')
@@ -196,6 +242,15 @@ def compute_and_plot_convergence(Z, max_n):
 
 
 def main(argv: list[str]) -> None:
+  """
+  Main function that serves as the entry point of the program.
+
+  Args:
+    argv (list[str]): Command-line arguments passed to the program.
+
+  Returns:
+    None
+  """
   logger = Logger('main')
 
   try:
