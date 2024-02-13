@@ -5,6 +5,7 @@ import numpy as np
 
 from agent import Agent
 from default_policy import default_policy
+from team_rennes_policy import team_rennes_policy
 
 WORLD_SIZE = 8
 WORLD_UPDATE_PERIOD = 10
@@ -48,7 +49,7 @@ def run_simulation() -> list:
             # print(f"rewards: {rewards}\n")
 
         # choose action and move agent
-        action = default_policy(agent)
+        action = team_rennes_policy(agent)
         agent.move(action, WORLD_SIZE)
         # print(f"move {action}")
         # print(f"position: {agent.position}")
@@ -82,11 +83,21 @@ def main():
     figpath = os.path.join("images", figname)
     plt.savefig(figpath)
     plt.close()
+    return final_averaged_reward
 
 
 def clean(folder: str) -> None:
     for filename in os.listdir(folder):
         os.remove(os.path.join(folder, filename))
+
+
+# if __name__ == "__main__":
+#     final_averaged_rewards = list()
+#     clean("images")
+#     for i in range(1000):
+#         final_averaged_reward = main()
+#         final_averaged_rewards.append(final_averaged_reward)
+#     print(f"final averaged rewards: {sum(final_averaged_rewards) / 1000:.3f}")
 
 
 if __name__ == "__main__":
