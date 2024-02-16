@@ -67,10 +67,10 @@ def run_simulation() -> list:
     return averaged_rewards
 
 
-def main():
+def main(i = None):
     averaged_rewards = run_simulation()
     final_averaged_reward = averaged_rewards[-1]
-    print(f"final reward: {final_averaged_reward:.3f}")
+    print(f"{i} -> final reward: {final_averaged_reward:.3f}" if i else f"final reward: {final_averaged_reward:.3f}", flush=True)
     plt.plot(range(TOTAL_NUMBER_OF_STEPS), averaged_rewards, "o", markersize=1)
     plt.xlabel("simulation steps")
     plt.ylabel("accumulated reward")
@@ -95,9 +95,9 @@ def clean(folder: str) -> None:
 #     final_averaged_rewards = list()
 #     clean("images")
 #     for i in range(1000):
-#         final_averaged_reward = main()
+#         final_averaged_reward = main(i)
 #         final_averaged_rewards.append(final_averaged_reward)
-#     print(f"final averaged rewards: {sum(final_averaged_rewards) / 1000:.3f}")
+#     print(f"final averaged rewards: {sum(final_averaged_rewards) / 1000:.3f}", flush=True)
 
 
 if __name__ == "__main__":
