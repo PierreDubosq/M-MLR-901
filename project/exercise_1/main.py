@@ -161,7 +161,10 @@ def compute_expected_value(Z):
   logger = Logger('compute_expected_value')
 
   try:
-    return numpy.mean(Z, axis=0)
+    expected_value = 0
+    for i in range(0, len(Z)):
+      expected_value += Z[i][0] * Z[i][1]
+    return expected_value
   except Exception as e:
     logger.error(e)
     raise e
