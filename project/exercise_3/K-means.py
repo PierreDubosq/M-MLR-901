@@ -5,7 +5,7 @@ from sklearn.cluster import KMeans
 from scipy.cluster.hierarchy import dendrogram, linkage
 
 # Load NPY file
-data = np.load('c:/Users/theor/Documents/GitHub/M-MLR-901/project/exercise_3/data.npy')
+data = np.load("data.npy")
 
 def find_optimal_k(data, max_clusters=10):
     """
