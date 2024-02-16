@@ -6,8 +6,6 @@ import datetime
 import sys
 
 
-DATA_PATH = 'data.csv'
-
 class Color(enum.Enum):
   DEFAULT = '\033[0m'
   BLACK = '\033[30m'
