@@ -4,8 +4,8 @@ def team_rennes_policy(agent):
     """
     Stochastic policy for the agent.
     """
-    initial_left_prob = 0.3
-    initial_right_prob = 0.3
+    initial_left_prob = 0.20
+    initial_right_prob = 0.20
     initial_stay_prob = 1 - initial_left_prob - initial_right_prob
 
     left_prob = initial_left_prob
