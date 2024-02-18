@@ -5,81 +5,97 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-# Load NPY file
-data = np.load('./data.npy')
-labels = np.load('./labels.npy')
+#load data files
+def readFiles():
+    data = np.load('./data.npy')
+    labels = np.load('./labels.npy')
+    return (data, labels)
 
-indices_to_plot = range(6)
+# make a graph with each column to examine which are dependings on each other
+def analyzeEachColumn(data):
+    indices_to_plot = data.length
+    for i, n in enumerate(indices_to_plot):
+         nth_elements = data[:, n]
+         plt.subplot(len(indices_to_plot), 1, i + 1)
+         plt.plot(nth_elements)
+         plt.xlabel('Index of Sub-array')
+         plt.ylabel(f'Value at Index {n}')
+         plt.title(f'Graph of the {n}th Element in Each Sub-array')
+    plt.tight_layout()
+    plt.show()
+    # => drawn conclusions based on manual verification of graphs: 3rd, 4th and 5th columns
+    # are very similar. 1st is like 6th but with more amplitude
+    # => to simplify the data set, we can manually remove columns 3, 4 and 6
 
-# Print all the content
-# print(labels)
+# apply the filtering explained above
+def filterColumns(data):
+    return data[:, [0, 1, 5]].copy()
 
-#fig, axs = plt.subplots(len(indices_to_plot), 1, figsize=(8, 2 * len(indices_to_plot)))
+def draw3Ddiagram(data, labels):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(data[:, 0], data[:, 1],
+               data[:, 2], c=labels, cmap='viridis')
+    ax.set_xlabel('Dimension 1')
+    ax.set_ylabel('Dimension 2')
+    ax.set_zlabel('Dimension 3')
+    plt.title('3D Scatter Plot of Manually Reduced Data with Boolean Labels')
+    plt.show()
 
-# Plot for each index
-# for i, n in enumerate(indices_to_plot):
-#    nth_elements = data[:, n]
-#
-#    # Create a subplot for each index
-#    plt.subplot(len(indices_to_plot), 1, i + 1)
-#    plt.plot(nth_elements)
-#    plt.xlabel('Index of Sub-array')
-#    plt.ylabel(f'Value at Index {n}')
-#    plt.title(f'Graph of the {n}th Element in Each Sub-array')
-#
-# plt.tight_layout()
-# plt.show()
+def draw2Ddiagram(data, labels, pca):
+    plt.scatter(data[:, 0], data[:, 1], c=labels, cmap='viridis')
+    plt.xlabel('Dimension 1')
+    plt.ylabel('Dimension 2')
+    plt.title('PCA Plot of Reduced Data with Confidence Ellipse')
 
-selected_columns = data[:, [0, 1, 5]].copy()
+    # calculate ellipsis
+    eigenvalues = pca.explained_variance_
+    angle = np.arccos(pca.components_[0, 0])  # rotation angle
+    width, height = 2 * np.sqrt(eigenvalues)  # Width and height 
 
-n_components = 2  # You can adjust this value based on your desired number of components
-pca = PCA(n_components=n_components)
-reduced_data = pca.fit_transform(selected_columns)
+    # draw the ellipsis
+    ellipse = plt.matplotlib.patches.Ellipse(xy=(
+        0, 0), width=width, height=height, angle=np.degrees(angle), fill=False, color='b')
+    plt.gca().add_patch(ellipse)
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(selected_columns[:, 0], selected_columns[:, 1],
-           selected_columns[:, 2], c=labels, cmap='viridis')
-ax.set_xlabel('Dimension 1')
-ax.set_ylabel('Dimension 2')
-ax.set_zlabel('Dimension 3')
-plt.title('3D Scatter Plot of Manually Reduced Data with Boolean Labels')
-plt.show()
-# 'reduced_data' now contains the reduced-dimensional representation of the input data
+    plt.show()
 
-# Print the explained variance ratio to see how much information is retained
-print("Explained Variance Ratio:")
-print(pca.explained_variance_ratio_)
+def train(data, labels):
+    X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
 
-# Afficher les résultats de la PCA en 2D avec une ellipse de confiance
-plt.scatter(reduced_data[:, 0], reduced_data[:, 1], c=labels, cmap='viridis')
-plt.xlabel('Dimension 1')
-plt.ylabel('Dimension 2')
-plt.title('PCA Plot of Reduced Data with Confidence Ellipse')
+    # Train a simple classifier (Logistic Regression for example)
+    classifier = LogisticRegression()
+    classifier.fit(X_train, y_train)
 
-# Calculer les demi-axes de l'ellipse de confiance
-eigenvalues = pca.explained_variance_
-angle = np.arccos(pca.components_[0, 0])  # Angle de rotation
-width, height = 2 * np.sqrt(eigenvalues)  # Largeur et hauteur de l'ellipse
+    # Predict on the test set
+    y_pred = classifier.predict(X_test)
 
-# Dessiner l'ellipse de confiance
-ellipse = plt.matplotlib.patches.Ellipse(xy=(
-    0, 0), width=width, height=height, angle=np.degrees(angle), fill=False, color='b')
-plt.gca().add_patch(ellipse)
+    # Evaluate the classifier's performance
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Classifier Accuracy: {accuracy:.2f}")
 
-plt.show()
+def main():
+    #load datas
+    data, labels = readFiles()
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(
-    reduced_data, labels, test_size=0.2, random_state=42)
+    # manually remove redundant informations
+    selected_columns = filterColumns(data)
 
-# Train a simple classifier (Logistic Regression for example)
-classifier = LogisticRegression()
-classifier.fit(X_train, y_train)
+    # draw 3D diagrams of current dataset
+    draw3Ddiagram(selected_columns, labels)
 
-# Predict on the test set
-y_pred = classifier.predict(X_test)
+    #further reducing dimensions with sklearn PCA
+    pca = PCA(n_components=2)
+    reduced_data = pca.fit_transform(selected_columns)
 
-# Evaluate the classifier's performance
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Classifier Accuracy: {accuracy:.2f}")
+    # Print the explained variance ratio to see how much information is retained
+    print("Explained Variance Ratio:")
+    print(pca.explained_variance_ratio_)
+
+    # Display PCA resultats in 2D with a confidence ellipsis
+    draw2Ddiagram(reduced_data, labels, pca)
+
+    # Split the data into training and testing sets
+    train(reduced_data, labels)
+
+main()
